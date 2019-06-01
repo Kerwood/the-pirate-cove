@@ -2,6 +2,11 @@
 Welcome to the Pirate Cove.  
 This is a complete container setup with the following software.
 
+### tl;dr
+  - Edit the `.env` file.
+  - Run `docker-compose up -d`
+  - Profit
+
 ## Sonarr
 Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
 
@@ -103,7 +108,7 @@ First a few rerequisites.
 ### Edit the .env file
 All configuration to this setup, I've put in the `.env` file, so all you have to do is go through it and edit it to fit your needs.
 
-First off, Traefik provides basic authentication for the web services, all except Plex which has its only user management. To create create the `user:password` string, run below command and replace the `BASIC_AUTH` variable with the result.
+First off, Traefik provides basic authentication for the web services, all except Plex which has its only user management. To create the `user:password` string, run below command and replace the `BASIC_AUTH` variable with the result.
 
 ```
 docker run -it --rm httpd bash -c "htpasswd -nB username-here"
@@ -125,4 +130,4 @@ If you haven't figured it out yet, this setup comes with a reverse proxy, Traefi
  - traefik.example.org
 
 Traefik will get certificates for the provides domain names.  
-At the bottom of the `.env` file you will find the the `STAGING_ENVIRONMENT` variable. As long as you are testing the setup keep this variable, it will trigger the staging environment at Lets Encrypt. If you keep tesing on production you will hit the rate limit and get temprary banned. When you are ready for production, just uncomment the line. `acme.json` is the file where Traefik keeps its certificates. Should you choose to create the `acme.json`file your self, remember to `chmod` it `600`.
+At the bottom of the `.env` file you will find the the `STAGING_ENVIRONMENT` variable. As long as you are testing the setup, keep this variable, it will trigger the staging environment at Lets Encrypt. If you keep tesing on production you will hit the rate limit and get temprary banned. When you are ready for production, just uncomment the line. `acme.json` is the file where Traefik keeps all its certificates. Should you choose to create the `acme.json`file your self, remember to `chmod` it `600`.
