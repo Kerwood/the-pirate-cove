@@ -135,7 +135,7 @@ services:
              --docker.endpoint="unix:///var/run/docker.sock" \
              --docker.watch=true \
              --docker.exposedbydefault=false \
-             --acme=true \
+             --acme=${ENABLE_LETS_ENCRYPT} \
              --acme.email=${LE_EMAIL} \
              --acme.entrypoint=https
              --acme.storage=/acme.json \
