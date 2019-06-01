@@ -3,7 +3,8 @@ Welcome to the Pirate Cove.
 This is a complete container setup with the following software.
 
 ### tl;dr
-  - Edit the `.env` file.
+  - Edit the `.env` file
+  - Run the `create-directories-from-env-file.sh` script
   - Run `docker-compose up -d`
   - Profit
 
