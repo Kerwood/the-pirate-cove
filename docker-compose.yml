@@ -1,0 +1,155 @@
+version: "3"
+services:
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    restart: unless-stopped
+    expose:
+      - 8989
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:${SONARR_DOMAIN_NAME}
+      - traefik.port=8989
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIME_ZONE}
+    volumes:
+      - ${SONARR_CONFIG_PATH}:/config
+      - ${TV_SHOWS_PATH}:/tv
+      - ${DL_COMPLETE_FOLDER}:/downloads
+
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    restart: unless-stopped
+    expose:
+      - 7878 
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:${RADARR_DOMAIN_NAME}
+      - traefik.port=7878
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIME_ZONE}
+    volumes:
+      - ${RADARR_CONFIG_PATH}:/config
+      - ${MOVIES_PATH}:/movies
+      - ${DL_COMPLETE_FOLDER}:/downloads
+
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    restart: unless-stopped
+    expose:
+      - 9117 
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:${JACKETT_DOMAIN_NAME}
+      - traefik.port=9117
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIME_ZONE}
+    volumes:
+      - ${JACKETT_CONFIG_PATH}:/config
+
+  rtorrent:
+    image: linuxserver/rutorrent
+    container_name: rtorrent
+    restart: unless-stopped 
+    ports:
+      - 51413:51413
+      - 6881:6881/udp
+    expose:
+      - 80 
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:${RTORRENT_DOMAIN_NAME}
+      - traefik.port=80
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - ${RTORRENT_CONFIG_PATH}:/config
+      - ${TORRENT_DL_FOLDER}:/downloads
+
+  plex:
+    image: plexinc/pms-docker 
+    container_name: plex
+    restart: unless-stopped
+    expose:
+      - 32400
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:${PLEX_DOMAIN_NAME}
+      - traefik.port=32400
+    environment:
+      - PLEX_UID=${PUID}
+      - PLEX_GID=${PGID}
+      - TZ=${TIME_ZONE}
+      - PLEX_CLAIM=${PLEX_CLAIM_TOKEN}
+    volumes:
+      - ${PLEX_CONFIG_PATH}:/config
+      - ${PLEX_MEDIA_PATH}:/data
+      - ${PLEX_TRANSCODE_PATH}:/transcode
+      - ${PLEX_LOGS_PATH}:/config/Library/Application Support/Plex Media Server/Logs
+#    devices:
+#      - /dev/dri/card0:/dev/dri/card0
+#      - /dev/dri/renderD128:/dev/dri/renderD128
+
+  tautulli:
+    image: tautulli/tautulli 
+    container_name: tautulli 
+    restart: unless-stopped
+    expose:
+      - 8181
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:${TAUTULLI_DOMAIN_NAME}
+      - traefik.port=8181
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TIME_ZONE}
+    volumes:
+      - ${TAUTULLI_CONFIG_PATH}:/config
+      - ${PLEX_LOGS_PATH}:/plex_logs:ro
+
+  traefik:
+    image: traefik
+    container_name: traefik
+    restart: unless-stopped
+    command: --api \
+             --loglevel=${LOG_LEVEL} \ 
+             --defaultentrypoints=http,https
+             --entrypoints="Name:http Address::80 Redirect.EntryPoint:https" \
+             --entrypoints="Name:https Address::443 TLS" \
+             --docker \
+             --docker.endpoint="unix:///var/run/docker.sock" \
+             --docker.watch=true \
+             --docker.exposedbydefault=false \
+             --acme=true \
+             --acme.email=${LE_EMAIL} \
+             --acme.entrypoint=https
+             --acme.storage=/acme.json \
+             --acme.onhostrule=true \
+             --acme.httpChallenge.entryPoint=http \
+             --acme.caserver=${STAGING_ENVIRONMENT}
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:traefik.linuxnet.io
+      - traefik.port=8080
+      - traefik.frontend.auth.basic=${BASIC_AUTH}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${TRAEFIK_ACME_FILE}:/acme.json
