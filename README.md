@@ -106,10 +106,12 @@ First a few rerequisites.
   - Ports 80/tcp and 443/tcp open for web access and Traefik to get certificates.
   - Ports 51413/tcp and 6881/udp open for Rtorrent.
 
+Second, because all the services are setup with `docker-compose` they can all reach each other by their Docker Compose service name. So fx. when connecting Sonarr with Jacket, then Jackett would be available on `http://jackett/api....`, which makes everything a lot easier.
+
 ### Edit the .env file
 All configuration to this setup, I've put in the `.env` file, so all you have to do is go through it and edit it to fit your needs.
 
-First off, Traefik provides basic authentication for the web services, all except Plex which has its only user management. To create the `user:password` string, run below command and replace the `BASIC_AUTH` variable with the result.
+First off, Traefik provides basic authentication for the web services, all except Plex which has its own user management. To create the `user:password` string, run below command and replace the `BASIC_AUTH` variable with the result.
 
 ```
 docker run -it --rm httpd bash -c "htpasswd -nB username-here"
@@ -130,5 +132,79 @@ If you haven't figured it out yet, this setup comes with a reverse proxy, Traefi
  - plexmon.example.org
  - traefik.example.org
 
-Traefik will get certificates for the provides domain names.  
+Traefik will get certificates for the provided domain names.  
 At the bottom of the `.env` file you will find the the `STAGING_ENVIRONMENT` variable. As long as you are testing the setup, keep this variable, it will trigger the staging environment at Lets Encrypt. If you keep tesing on production you will hit the rate limit and get temprary banned. When you are ready for production, just uncomment the line. `acme.json` is the file where Traefik keeps all its certificates. Should you choose to create the `acme.json`file your self, remember to `chmod` it `600`.
+
+If your running into issues with Traefik, change the `LOG_LEVEL` to `debug` to get more detailed logs.
+
+### Jackett
+Got to `https://jackett.example.org` and login.  
+Now add an indexer for each of your torrent sites you wish to use. Its pretty straight forward so I will not be covering that part.
+
+### Sonarr
+In Sonarr you will need to setup an Indexer and a Download Client.  
+Go to `Settings` -> `Indexers` to add en new Index. Choose the **Torznab** button.  
+There are two ways to do this. You can either add your Indexers one by one for each of your trackers. Or you add all of your trackers in the same indexer. 
+
+First example, adding TorrentLeech as an indexer. Press the `Copy Torznab Feed` in Jackett and paste it into the URL input. Keep in mind that copied URL will be the external URL, you therefore need to edit from `https://jackett.example.org/...` to `http://jacket:9117/...`  
+The Jackett API key you will find on the Jackett site.
+![](/images/sonarr-indexer-single-tracker.png)
+
+To add all trackers to the same indexer, just add `http://jackett:9117/torznab/all/api` as the URL.
+![](/images/sonarr-indexer-all-trackers.png)
+
+You will have to adjust the categories acordingly to your needs.
+
+Next add the Download Client. Go to `Settings` -> `Download Client` and select **rTorrent**. Fill out the form as below.
+![](/images/sonarr-download-client.png)
+
+### Radarr
+
+Same setup with Radarr.
+
+Single tracker indexer.
+![](/images/radarr-indexer-single-tracker.png)
+
+All trackers indexer.
+![](/images/radarr-indexer-all-trackers.png)
+
+And the Download Client
+![](/images/radarr-download-client.png)
+
+
+### rTorrent
+
+There isn't much to setup with rTorrent. Maybe go in and remove/disable some plugins from the WebUI. It comes loaded with about almost all plugins avaiable for ruTorrent.  
+The rTorrent container takes a while to start up, so be patient.
+
+### Plex
+Nothing to setup.. Just login with your Plex account. Remember that the claim token is only valid for 4 min and you only need it the first time it start up. So get your claim token at [https://www.plex.tv/claim/](https://www.plex.tv/claim/)  
+
+In the `docker-compose.yml` file, under the Plex section, you will find below outcommented lines. If you have a supported graphics card you could uncomment those lines and get hardware acceleration. I haven't testet or tried it though. 
+
+```
+devices:
+  - /dev/dri/card0:/dev/dri/card0
+  - /dev/dri/renderD128:/dev/dri/renderD128
+```
+
+### Tautulli
+Not much here either. The service will not be up before your Plex server is running. After that you will get a wizard where you will have to give til host address for Plex. Again, just use the Docker Compose service name as in the picture below.
+
+![](/images/tautulli-setup.png)
+
+
+### Traefik
+The dashboard will be available on `https://traefik.example.org`  
+All Traefik configuration is handled in the `docker-compose.yml` file.
+
+## Licens
+```
+--------------------------------------------------------------------------------
+ THE BEER-WARE LICENSE (Revision 42):
+ <patrick@kerwood.dk> wrote this script. As long as you retain this notice you"
+ can do whatever you want with this stuff. If we meet some day, and you think"
+ this stuff is worth it, you can buy me a beer in return."
+ - Patrick Kerwood @ LinuxBloggen.dk
+--------------------------------------------------------------------------------
+```
