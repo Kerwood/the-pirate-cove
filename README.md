@@ -2,12 +2,6 @@
 Welcome to the Pirate Cove.  
 This is a complete container setup with the following software.
 
-### tl;dr
-  - Edit the `.env` file
-  - Run the `create-directories-from-env-file.sh` script
-  - Run `docker-compose up -d`
-  - Profit
-
 ## Sonarr
 Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
 
@@ -107,6 +101,12 @@ First a few rerequisites.
   - Ports 51413/tcp and 6881/udp open for Rtorrent.
 
 Second, because all the services are setup with `docker-compose` they can all reach each other by their Docker Compose service name. So fx. when connecting Sonarr with Jacket, then Jackett would be available on `http://jackett/api....`, which makes everything a lot easier.
+
+### tl;dr
+  - Edit the `.env` file
+  - Run the `create-directories-from-env-file.sh` script
+  - Run `docker-compose up -d`
+  - Profit
 
 ## Edit the .env file
 All configuration to this setup, I've put in the `.env` file, so all you have to do is go through it and edit it to fit your needs.
