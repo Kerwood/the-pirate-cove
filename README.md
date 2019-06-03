@@ -108,7 +108,7 @@ First a few rerequisites.
 
 Second, because all the services are setup with `docker-compose` they can all reach each other by their Docker Compose service name. So fx. when connecting Sonarr with Jacket, then Jackett would be available on `http://jackett/api....`, which makes everything a lot easier.
 
-### Edit the .env file
+## Edit the .env file
 All configuration to this setup, I've put in the `.env` file, so all you have to do is go through it and edit it to fit your needs.
 
 First off, Traefik provides basic authentication for the web services, all except Plex which has its own user management. To create the `user:password` string, run below command and replace the `BASIC_AUTH` variable with the result.
@@ -137,11 +137,11 @@ At the bottom of the `.env` file you will find the the `STAGING_ENVIRONMENT` var
 
 If your running into issues with Traefik, change the `LOG_LEVEL` to `debug` to get more detailed logs.
 
-### Jackett
+## Jackett
 Got to `https://jackett.example.org` and login.  
 Now add an indexer for each of your torrent sites you wish to use. Its pretty straight forward so I will not be covering that part.
 
-### Sonarr
+## Sonarr
 In Sonarr you will need to setup an Indexer and a Download Client.  
 Go to `Settings` -> `Indexers` to add en new Index. Choose the **Torznab** button.  
 There are two ways to do this. You can either add your Indexers one by one for each of your trackers. Or you add all of your trackers in the same indexer. 
@@ -158,7 +158,7 @@ You will have to adjust the categories acordingly to your needs.
 Next add the Download Client. Go to `Settings` -> `Download Client` and select **rTorrent**. Fill out the form as below.
 ![](/images/sonarr-download-client.png)
 
-### Radarr
+## Radarr
 
 Same setup with Radarr.
 
@@ -172,7 +172,7 @@ And the Download Client
 ![](/images/radarr-download-client.png)
 
 
-### rTorrent
+## rTorrent
 
 There isn't much to setup with rTorrent. Maybe go in and remove/disable some plugins from the WebUI. It comes loaded with about almost all plugins avaiable for ruTorrent.  
 The rTorrent container takes a while to start up, so be patient.
@@ -188,13 +188,13 @@ devices:
   - /dev/dri/renderD128:/dev/dri/renderD128
 ```
 
-### Tautulli
+## Tautulli
 Not much here either. The service will not be up before your Plex server is running. After that you will get a wizard where you will have to give til host address for Plex. Again, just use the Docker Compose service name as in the picture below.
 
 ![](/images/tautulli-setup.png)
 
 
-### Traefik
+## Traefik
 The dashboard will be available on `https://traefik.example.org`  
 All Traefik configuration is handled in the `docker-compose.yml` file.
 
