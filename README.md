@@ -1,4 +1,4 @@
-# Pirate Cove
+# The Pirate Cove
 Welcome to the Pirate Cove.  
 This is a complete container setup with the following software.
 
