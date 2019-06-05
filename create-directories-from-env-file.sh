@@ -42,6 +42,7 @@ create_directory $(sed -rn 's/(TAUTULLI_CONFIG_PATH)=.*/\1/p' .env) $(sed -rn 's
 echo
 
 echo "${BOLD}Setting up the Traefik acme file..${NORMAL}"
+echo
 create_directory $(sed -rn 's/(TRAEFIK_ACME_FILE)=.*/\1/p' .env) $(sed -rn 's/TRAEFIK_ACME_FILE=(.*)\/.*$/\1/p' .env)
 
 ACME_FILE=$(sed -rn 's/TRAEFIK_ACME_FILE=(.*)/\1/p' .env)
