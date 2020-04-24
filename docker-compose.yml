@@ -123,7 +123,7 @@ services:
       - ${PLEX_LOGS_PATH}:/plex_logs:ro
 
   traefik:
-    image: traefik
+    image: traefik:v1.7
     container_name: traefik
     restart: unless-stopped
     command: --api \
